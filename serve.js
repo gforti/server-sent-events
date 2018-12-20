@@ -24,8 +24,9 @@ Stream.on('push', (event, data) => {
     if(!res || res.finished) return
     res.write(`event: ${String(event)}\n`)
     //res.write(`id: ${new Date().getTime()}\n`)
-    res.write(`data: ${JSON.stringify(data)}`)
-    res.write('\n\n')
+    res.write(`data: ${JSON.stringify(data)}\n`)
+    res.write('retry: 10000\n')
+    res.write('\n')
   })
 })
 
