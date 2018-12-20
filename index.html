@@ -10,14 +10,19 @@
 
 <body>
   <p>In coming message</p>
+  <button>Stop</button>
   <message-incoming></message-incoming>
 
   <script>
+    document.querySelector('button').addEventListener('click', () => {
+      eventSource.close()
+    })
     // Declare an EventSource
     const eventSource = new EventSource(`${window.location.origin}/stream`);
     // Handler for events without an event type specified
     eventSource.addEventListener('message', (e) => {
-      console.log(e.data)
+      //console.log(e.data)
+       document.querySelector('message-incoming').dataset.msg = e.data
     })
     // Handler for events of type 'eventType' only
     eventSource.addEventListener('test', (e) => {

@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const express = require('express');
+const { performance } = require('perf_hooks');
 const app = express();
 const port = process.env.port || 9000
 const root = __dirname
@@ -12,6 +13,21 @@ const fallback = (...pathOptions) => (req, res, next) => {
     res.sendFile.call(res, ...pathOptions, error => error && next())
   } else next()
 }
+
+function generateUUID() {
+  return String(new Date().getTime()+performance.now()).replace('.', '-')
+}
+let resConnections = new Map()
+
+Stream.on('push', (event, data) => {
+  resConnections.forEach((res) => {
+    if(!res || res.finished) return
+    res.write(`event: ${String(event)}\n`)
+    //res.write(`id: ${new Date().getTime()}\n`)
+    res.write(`data: ${JSON.stringify(data)}`)
+    res.write('\n\n')
+  })
+})
 
 app.use(express.static(root))
 //app.use(fallback('index.html', { root }))
@@ -32,11 +48,21 @@ app.get('/stream', function(request, response){
     'Content-Type': 'text/event-stream',
   })
 
-  Stream.on("push", function(event, data) {
-    response.write(`event: ${String(event)}\n`)
-    //response.write(`id: ${new Date().getTime()}\n`)
-    response.write(`data: ${JSON.stringify(data)}`)
-    response.write('\n\n')
+   if (request.headers['last-event-id']) {
+    const eventId = parseInt(request.headers['last-event-id'])
+    console.log(eventId)
+   }
+
+   // This might not be needed with HTTP/2.0
+   const clientID = generateUUID()
+   resConnections.set(clientID, response)
+
+  request.on('close', () => {
+      if (!response.finished) {
+        response.end()
+        resConnections.delete(clientID)
+        console.log('Stopped sending events to', clientID)
+      }
   })
 
 })
