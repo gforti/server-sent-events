@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base href="/">
+  <title>EventSource</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  <p>In coming message</p>
+  <message-incoming></message-incoming>
+
+  <script>
+    // Declare an EventSource
+    const eventSource = new EventSource(`${window.location.origin}/stream`);
+    // Handler for events without an event type specified
+    eventSource.addEventListener('message', (e) => {
+      console.log(e.data)
+    })
+    // Handler for events of type 'eventType' only
+    eventSource.addEventListener('test', (e) => {
+      /*console.log(e)
+      console.log(e.data)*/
+      document.querySelector('message-incoming').dataset.msg = JSON.parse(e.data).msg
+
+    })
+
+    eventSource.addEventListener('error', (e) => {
+      document.querySelector('message-incoming').dataset.msg = 'EventSource failed.'
+    })
+
+
+    window.customElements.define('message-incoming', class extends HTMLElement {
+
+      constructor() {
+        super()
+      }
+
+      generateTemplate() {
+        const slot = this.innerText
+        return `
+      <blockquote>
+        <big>
+          <span></span>
+          ${slot}
+        </big>
+      </blockquote>
+    `
+      }
+
+      connectedCallback() {
+        this.innerHTML = this.generateTemplate()
+        this.contentStatus = this.querySelector('span')
+      }
+
+      static get observedAttributes() {
+        return ['data-msg']
+      }
+
+      attributeChangedCallback(attr, oldValue, newValue) {
+        if (oldValue !== newValue) {
+          this.contentStatus.innerText = newValue
+        }
+      }
+    })
+  </script>
+
+</body>
+
+</html>

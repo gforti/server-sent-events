@@ -1,0 +1,13 @@
+{
+  "name": "eventsource",
+  "description": "Server sent events with Event Source",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node serve.js --port 9000"
+  },
+  "dependencies": {
+    "express": "^4.16.4"
+  }
+}
