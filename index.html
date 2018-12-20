@@ -28,8 +28,12 @@
     eventSource.addEventListener('test', (e) => {
       /*console.log(e)
       console.log(e.data)*/
-      document.querySelector('message-incoming').dataset.msg = JSON.parse(e.data).msg
-
+      if (e.lastEventId === 'CLOSE') {
+        eventSource.close()
+        console.log('closed from Server', e)
+      } else {
+        document.querySelector('message-incoming').dataset.msg = JSON.parse(e.data).msg
+      }
     })
 
     eventSource.addEventListener('error', (e) => {
