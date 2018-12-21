@@ -1,7 +1,7 @@
 const EventEmitter = require('events')
 const express = require('express')
 const { performance } = require('perf_hooks')
-const app = express();
+const app = express()
 const port = process.env.port || 9000
 const root = __dirname
 const Stream = new EventEmitter()
