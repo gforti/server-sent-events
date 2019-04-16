@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "node serve.js --port 9000"
+    "start": "node host.js & node serve.js"
   },
   "dependencies": {
     "express": "^4.16.4"

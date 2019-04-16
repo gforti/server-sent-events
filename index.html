@@ -18,7 +18,7 @@
       eventSource.close()
     })
     // Declare an EventSource
-    const eventSource = new EventSource(`${window.location.origin}/stream`);
+    const eventSource = new EventSource(`${window.location.protocol}//${window.location.hostname}:9001/stream`, { withCredentials: true });
     // Handler for events without an event type specified
     eventSource.addEventListener('message', (e) => {
       //console.log(e.data)
