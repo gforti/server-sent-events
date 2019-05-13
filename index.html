@@ -9,37 +9,53 @@
 </head>
 
 <body>
-  <p>In coming message</p>
-  <button>Stop</button>
+  <p>Incoming message</p>
+  <button>Open</button>
   <message-incoming></message-incoming>
 
   <script>
-    document.querySelector('button').addEventListener('click', () => {
-      eventSource.close()
-    })
-    // Declare an EventSource
-    const eventSource = new EventSource(`${window.location.protocol}//${window.location.hostname}:9001/stream`, { withCredentials: true });
-    // Handler for events without an event type specified
-    eventSource.addEventListener('message', (e) => {
-      //console.log(e.data)
-       document.querySelector('message-incoming').dataset.msg = e.data
-    })
-    // Handler for events of type 'eventType' only
-    eventSource.addEventListener('test', (e) => {
-      /*console.log(e)
-      console.log(e.data)*/
-      if (e.lastEventId === 'CLOSE') {
-        eventSource.close()
-        console.log('closed from Server', e)
+    const btn = document.querySelector('button')
+    btn.addEventListener('click', () => {
+      if (btn.innerText === 'Open') {
+        open()
+        btn.innerText = 'Stop'
       } else {
-        document.querySelector('message-incoming').dataset.msg = JSON.parse(e.data).msg
+        eventSource.close()
+        btn.innerText = 'Open'
       }
     })
 
-    eventSource.addEventListener('error', (e) => {
-      document.querySelector('message-incoming').dataset.msg = 'EventSource failed.'
-    })
+    let eventSource
+    const messageIncoming = document.querySelector('message-incoming')
 
+    function open() {
+      // Declare an EventSource
+      eventSource = new EventSource(`${window.location.protocol}//${window.location.hostname}:9001/stream`, { withCredentials: true });
+
+      /* Handler for events without an event type specified should be 'message'
+        but if the event source does send a type use that */
+
+      eventSource.addEventListener('test', (e) => {
+        //console.log(e.data)
+        messageIncoming.dataset.msg = e.data
+      })
+
+      // Handler for events of type 'eventType' only
+      eventSource.addEventListener('test', (e) => {
+        /*console.log(e)
+        console.log(e.data)*/
+        if (e.lastEventId === 'CLOSE') {
+          eventSource.close()
+          console.log('closed from Server', e)
+        } else {
+          messageIncoming.dataset.msg = JSON.parse(e.data).msg
+        }
+      })
+
+      eventSource.addEventListener('error', (e) => {
+        messageIncoming.dataset.msg = 'EventSource failed.'
+      })
+    }
 
     window.customElements.define('message-incoming', class extends HTMLElement {
 
@@ -50,13 +66,13 @@
       generateTemplate() {
         const slot = this.innerText
         return `
-      <blockquote>
-        <big>
-          <span></span>
-          ${slot}
-        </big>
-      </blockquote>
-    `
+          <blockquote>
+            <big>
+              <span></span>
+              ${slot}
+            </big>
+          </blockquote>
+        `
       }
 
       connectedCallback() {

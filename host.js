@@ -7,6 +7,7 @@ const root = __dirname
 const Stream = new EventEmitter()
 
 const Nouns = require('./nouns')
+const EVENT_TYPE = 'test'
 
 const fallback = (...pathOptions) => (req, res, next) => {
   if ((req.method === 'GET' || req.method === 'HEAD') && req.accepts('html')) {
@@ -51,18 +52,20 @@ app.use(express.static(root))
 
 let timer = setInterval(() => {
   const randNoun = Math.floor(Math.random() * Nouns.length)
-  Stream.emit('push', 'test', { msg: Nouns[randNoun] })
+  Stream.emit('push', EVENT_TYPE, { msg: Nouns[randNoun] })
 }, 5000)
 
 app.get('/stream', function (request, response) {
   response.writeHead(200, {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': 'http://localhost:9000',
+    'Access-Control-Allow-Credentials': true,
     'Cache-Control': 'no-cache',
     'Connection': 'keep-alive',
     'Content-Type': 'text/event-stream',
   })
 
   console.log(request.headers.cookie)
+  console.log(request.headers.origin)
 
   if (request.headers['last-event-id']) {
     const eventId = parseInt(request.headers['last-event-id'])
