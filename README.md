@@ -2,9 +2,9 @@
 
 This is a simple example of how to setup a server with Server sent Events along side the Client side implementation on how to receive them.  Compared to webSockets this is a one way event where the client receives from the server but cannot send any data back.
 
-The EventSource API instance opens a persistent connection to an HTTP server, which sends events in text/event-stream format.
+The EventSource API instance opens a persistent connection to an HTTP server, which sends events in `text/event-stream` format.
 
-Sending data requires some fields ending with a double `\n\n`
+> Sending data requires an extra `\n` at the end of the `text/event-stream` format
 
 | Field  | Info |
 |:---------:|:---------:|
