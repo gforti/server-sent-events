@@ -91,7 +91,7 @@ let httpInstance = app.listen(port)
 process.on('SIGINT', async () => {
   console.log('gracefully shutting down')
   clearInterval(timer)
-  await closeConnections('test')
+  await closeConnections(EVENT_TYPE)
   httpInstance.close()
   process.exit(0)
 })

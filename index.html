@@ -35,7 +35,7 @@
       /* Handler for events without an event type specified should be 'message'
         but if the event source does send a type use that */
 
-      eventSource.addEventListener('test', (e) => {
+      eventSource.addEventListener('message', (e) => {
         //console.log(e.data)
         messageIncoming.dataset.msg = e.data
       })
